@@ -5,6 +5,7 @@ import (
 	"github.com/taalhach/aroundhome-challennge/internal/server/database"
 	"github.com/taalhach/aroundhome-challennge/internal/server/models"
 	"github.com/taalhach/aroundhome-challennge/pkg/forms"
+	"gorm.io/gorm"
 )
 
 type PartnerListItem struct {
@@ -64,4 +65,19 @@ func FindMatchedPartners(form *forms.BasicList, longitude, latitude float64) ([]
 	}
 
 	return items, total, nil
+}
+
+func PartnerDetails(target *models.Partner) (bool, *PartnerListItem, error) {
+	var partner PartnerListItem
+	if err := database.Db.Model(&models.Partner{}).
+		Where(target).Select("id,name,latitude,longitude, rating").
+		Take(&partner).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil, nil
+		}
+
+		return false, nil, err
+	}
+
+	return true, &partner, nil
 }
