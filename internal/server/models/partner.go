@@ -2,6 +2,7 @@ package models
 
 type Partner struct {
 	Id        int64   `gorm:"primaryKey"`
+	Name      string  `gorm:"column:name; type:TEXT"`
 	Latitude  float64 `gorm:"column:latitude; type:float"`
 	Longitude float64 `gorm:"column:longitude; type:float"`
 	Radius    int     `gorm:"column:radius; type:int;"`
