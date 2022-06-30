@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator"
+	"github.com/taalhach/aroundhome-challennge/pkg/items"
 )
 
 type CustomValidator struct {
@@ -40,9 +41,19 @@ func (this *CustomValidator) Init() error {
 		return name
 	})
 
+	if err := this.validator.RegisterValidation("availableMaterial", availableMaterial); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (this *CustomValidator) Validate(i interface{}) error {
 	return this.validator.Struct(i)
+}
+
+//availableMaterial check if material is in items.AvailableMaterials
+func availableMaterial(enum validator.FieldLevel) bool {
+	_, found := items.Materials[strings.ToLower(enum.Field().String())]
+	return found
 }

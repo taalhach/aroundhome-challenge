@@ -4,7 +4,6 @@ import (
 	"github.com/taalhach/aroundhome-challennge/internal/server/common"
 	"github.com/taalhach/aroundhome-challennge/internal/server/database"
 	"github.com/taalhach/aroundhome-challennge/internal/server/models"
-	"github.com/taalhach/aroundhome-challennge/pkg/forms"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +17,7 @@ type PartnerListItem struct {
 }
 
 //FindMatchedPartners finds partners matched with customer, supports pagination
-func FindMatchedPartners(form *forms.BasicList, longitude, latitude float64) ([]*PartnerListItem, int64, error) {
+func FindMatchedPartners(listParams *common.BasicList, longitude, latitude float64) ([]*PartnerListItem, int64, error) {
 	var (
 		err   error
 		total int64
@@ -35,38 +34,32 @@ func FindMatchedPartners(form *forms.BasicList, longitude, latitude float64) ([]
 		"material": "materials.name",
 	}
 
-	// prepare list params
-	listParams := common.BasicList{
-		Limit:   form.Limit,
-		Page:    form.Page,
-		Filters: form.Filters,
-		Query:   query,
-		Columns: columns,
-	}
+	listParams.Columns = columns
 
 	// first skip so that we can get count of all first
 	listParams.SkipPagination = true
-	listParams.Query, err = listParams.PrepareSql()
+	query, err = listParams.PrepareSql(query)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// count total items
-	if err = listParams.Query.Count(&total).Error; err != nil {
+	if err = query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// apply pagination by adding limit and offset
-	listParams.Query = listParams.Paginate()
+	query = listParams.Paginate(query)
 
 	const selectColumns = "partners.id, partners.name, latitude, longitude, rating, ST_DistanceSphere(ST_MakePoint(longitude, latitude),ST_MakePoint(?, ?)) AS distance"
-	if err := listParams.Query.Select(selectColumns, longitude, latitude).Order("partners.rating DESC, distance DESC").Find(&items).Error; err != nil {
+	if err := query.Select(selectColumns, longitude, latitude).Order("partners.rating DESC, distance DESC").Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
 
 	return items, total, nil
 }
 
+//PartnerDetails get partner details
 func PartnerDetails(target *models.Partner) (bool, *PartnerListItem, error) {
 	var partner PartnerListItem
 	if err := database.Db.Model(&models.Partner{}).

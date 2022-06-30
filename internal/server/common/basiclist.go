@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/taalhach/aroundhome-challennge/pkg/items"
 	"gorm.io/gorm"
 )
 
@@ -32,36 +33,37 @@ type Sort struct {
 }
 
 type BasicList struct {
-	Query   *gorm.DB
+	Limit     int      `query:"limit"`
+	Page      int      `query:"page"`
+	SortBy    string   `query:"sort_by"`
+	SortOrder string   `query:"sort_order"`
+	Filters   []string `query:"filters"`
+
 	Columns map[string]string
-	Sort    *Sort
 
 	// pagination related
-	Limit          int
-	Page           int
 	SkipPagination bool
-	Filters        []string
 
 	// sort related
 	SkipOrder bool
 }
 
 //PrepareSql molds query and applies filters and pagination
-func (form BasicList) PrepareSql() (*gorm.DB, error) {
-	if !form.SkipOrder {
-		if form.Sort != nil {
-			column, ok := form.Columns[form.Sort.By]
-			if !ok {
-				return nil, fmt.Errorf("column mapping for %v not found", column)
-			}
-
-			sort := column
-			if form.Sort.Desc {
-				sort = fmt.Sprintf("%s DESC", column)
-			}
-
-			form.Query = form.Query.Order(sort)
+func (form *BasicList) PrepareSql(query *gorm.DB) (*gorm.DB, error) {
+	if form.SortBy != "" {
+		column, ok := form.Columns[form.SortBy]
+		if !ok {
+			return nil, fmt.Errorf("column mapping for %v not found", column)
 		}
+
+		sort := column
+		if form.SortOrder != "" {
+			sort = fmt.Sprintf("%s %s", column, form.SortOrder)
+		} else {
+			sort = fmt.Sprintf("%s", column)
+		}
+
+		query = query.Order(sort)
 	}
 
 	for _, filter := range form.Filters {
@@ -78,23 +80,23 @@ func (form BasicList) PrepareSql() (*gorm.DB, error) {
 
 			switch strings.ToLower(operation) {
 			case eq:
-				form.Query = form.Query.Where(fmt.Sprintf("%s = ?", column), val)
+				query = query.Where(fmt.Sprintf("%s = ?", column), val)
 			case gte:
-				form.Query = form.Query.Where(fmt.Sprintf("%s >= ?", column), val)
+				query = query.Where(fmt.Sprintf("%s >= ?", column), val)
 			case gt:
-				form.Query = form.Query.Where(fmt.Sprintf("%s > ?", column), val)
+				query = query.Where(fmt.Sprintf("%s > ?", column), val)
 			case lte:
-				form.Query = form.Query.Where(fmt.Sprintf("%s <= ?", column), val)
+				query = query.Where(fmt.Sprintf("%s <= ?", column), val)
 			case lt:
-				form.Query = form.Query.Where(fmt.Sprintf("%s < ?", column), val)
+				query = query.Where(fmt.Sprintf("%s < ?", column), val)
 			case neq:
-				form.Query = form.Query.Where(fmt.Sprintf("%s <> ?", column), val)
+				query = query.Where(fmt.Sprintf("%s <> ?", column), val)
 			case startWith:
-				form.Query = form.Query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%s%%", val))
+				query = query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%s%%", val))
 			case endsWith:
-				form.Query = form.Query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%%%s", val))
+				query = query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%%%s", val))
 			case contains:
-				form.Query = form.Query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%%%s%%", val))
+				query = query.Where(fmt.Sprintf("%s LIKE ?", column), fmt.Sprintf("%%%s%%", val))
 			case between:
 				//get second value
 				var secVal string
@@ -103,41 +105,36 @@ func (form BasicList) PrepareSql() (*gorm.DB, error) {
 				} else {
 					secVal = val
 				}
-				form.Query = form.Query.Where(fmt.Sprintf("%s BETWEEN ? AND ?", column), val, secVal)
+				query = query.Where(fmt.Sprintf("%s BETWEEN ? AND ?", column), val, secVal)
 			}
 		}
 	}
 
 	if !form.SkipPagination {
-		form.Query = form.Paginate()
+		query = form.Paginate(query)
 	}
 
-	return form.Query, nil
+	return query, nil
 }
 
 //Paginate applies pagination if skipped in PrepareSql method
-func (form BasicList) Paginate() *gorm.DB {
+func (form *BasicList) Paginate(query *gorm.DB) *gorm.DB {
+	// attach default pagination is limit and page are zero
+	form.attachDefaultsPagination()
+	// now paginate
 	offset := (form.Page - 1) * form.Limit
-	form.Query = form.Query.Limit(form.Limit).Offset(offset)
+	query = query.Limit(form.Limit).Offset(offset)
 
-	return form.Query
+	return query
 }
 
-//ApplySort applies sorting if skipped in PrepareSql
-func (form BasicList) ApplySort() (*gorm.DB, error) {
-	if form.Sort != nil {
-		column, ok := form.Columns[form.Sort.By]
-		if !ok {
-			return nil, fmt.Errorf("column mapping for %v not found", column)
-		}
-
-		sort := column
-		if form.Sort.Desc {
-			sort = fmt.Sprintf("%s DESC", column)
-		}
-
-		form.Query = form.Query.Order(sort)
+// attachDefaults attaches items.DefaultPaginationLimit and 1st page if no query params are passed by client
+func (bl *BasicList) attachDefaultsPagination() {
+	if bl.Limit == 0 {
+		bl.Limit = items.DefaultPaginationLimit
 	}
 
-	return form.Query, nil
+	if bl.Page == 0 {
+		bl.Page = 1
+	}
 }

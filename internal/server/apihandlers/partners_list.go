@@ -5,25 +5,19 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/taalhach/aroundhome-challennge/pkg/forms"
-
-	"github.com/taalhach/aroundhome-challennge/internal/server/database/dbutils"
-
 	"github.com/labstack/echo/v4"
 	"github.com/taalhach/aroundhome-challennge/internal/server/common"
+	"github.com/taalhach/aroundhome-challennge/internal/server/database/dbutils"
 )
 
 type matchedPartnersListForm struct {
-	Limit     int     `query:"limit"  json:"limit"`
-	Page      int     `query:"page"  json:"page"`
+	common.BasicList
+	Material  string  `query:"material" validate:"required,availableMaterial" json:"material"`
 	Latitude  float64 `query:"latitude"  validate:"required" json:"latitude"`
 	Longitude float64 `query:"longitude" validate:"required" json:"longitude"`
 	FloorArea float32 `query:"floor_area"`
 }
 
-type matchedPartnersListParams struct {
-	Material float32 `param:"material"`
-}
 type partnersListResponse struct {
 	common.BasicListRet
 	Items []*dbutils.PartnerListItem `json:"items"`
@@ -47,14 +41,10 @@ func PartnersList(c echo.Context) error {
 	}
 
 	material := c.Param("material")
-	basicList := forms.BasicList{
-		Limit:   form.Limit,
-		Page:    form.Limit,
-		Filters: []string{fmt.Sprintf("material:eq:%s", material)},
-	}
-	basicList.AttachDefaults()
+	// add material filter
+	form.Filters = append(form.Filters, fmt.Sprintf("material:eq:%s", material))
 
-	items, total, err := dbutils.FindMatchedPartners(&basicList, form.Longitude, form.Latitude)
+	items, total, err := dbutils.FindMatchedPartners(&form.BasicList, form.Longitude, form.Latitude)
 	if err != nil {
 		return err
 	}
@@ -62,7 +52,7 @@ func PartnersList(c echo.Context) error {
 	ret := partnersListResponse{
 		BasicListRet: common.BasicListRet{
 			Page:  form.Page,
-			Pages: int(math.Ceil(float64(total) / float64(basicList.Limit))),
+			Pages: int(math.Ceil(float64(total) / float64(form.Limit))),
 			Total: total,
 		},
 		Items: items,

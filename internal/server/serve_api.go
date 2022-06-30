@@ -109,9 +109,8 @@ var serverApi = &cobra.Command{
 			return c.String(http.StatusOK, "pong")
 		})
 
-		// page data request
+		e.GET("partners", apihandlers.PartnersList)
 		e.GET("partners/:id", apihandlers.PartnerDetails)
-		//e.GET("partners/:material", apihandlers.PartnersList)
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 		// serves api on specified port
