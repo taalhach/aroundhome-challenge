@@ -1,0 +1,252 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "bsdex's code challenge API specs.",
+        "title": "aroundhome-challennge API docs",
+        "contact": {
+            "name": "Muhammad Talha",
+            "email": "talhach891@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "0.1"
+    },
+    "host": "localhost:3000",
+    "paths": {
+        "/page_data": {
+            "get": {
+                "description": "This API can be used to retrieve page data list,\nwhich is filterable and provides capabilities on basis of all fields.",
+                "summary": "Get page data list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/forms.BasicResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "This API is used to update page data. Only clicks and views are updated with this Request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Update Page data",
+                "parameters": [
+                    {
+                        "description": "Page",
+                        "name": "page",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataUpdateForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/forms.BasicResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "An API to create page data. If page url already exist this request will fail",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Create Page data",
+                "parameters": [
+                    {
+                        "description": "Page",
+                        "name": "page",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataCreateForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/forms.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/page_data/{url}": {
+            "get": {
+                "description": "This API returns page data details.",
+                "summary": "Get page data's details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "URL",
+                        "name": "url",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/forms.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/page_data/{url}/increment": {
+            "patch": {
+                "description": "This API is used to increment page views and clicks.",
+                "summary": "Increments clicks and views",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "URL",
+                        "name": "url",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/forms.BasicResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apihandlers.pageDataCreateForm": {
+            "type": "object",
+            "required": [
+                "url"
+            ],
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "apihandlers.pageDataResponse": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "page": {
+                    "$ref": "#/definitions/models.PageData"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "apihandlers.pageDataUpdateForm": {
+            "type": "object",
+            "required": [
+                "clicks",
+                "url",
+                "views"
+            ],
+            "properties": {
+                "clicks": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "views": {
+                    "type": "integer"
+                }
+            }
+        },
+        "forms.BasicResponse": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.PageData": {
+            "type": "object",
+            "properties": {
+                "clicks": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_updated_at": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "views": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
