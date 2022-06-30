@@ -3,10 +3,10 @@ clean:
 
 build: clean
 	@mkdir -p bin
-	@go build -o bin/challenge cmd/challenge/main.go
+	@go build -o bin/aroundhome cmd/aroundhome/main.go
 
 test-unit:
 	@go test -race ./...
 
 run:
-	@go run cmd/challenge/main.go serve_api
+	@go run cmd/aroundhome/main.go serve_api

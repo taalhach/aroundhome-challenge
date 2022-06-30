@@ -9,9 +9,12 @@ COPY . .
 RUN make build
 FROM alpine:latest
 WORKDIR /root/
-COPY config-files/app-configs-docker.ini  .
+COPY configs/app-configs-docker.ini  .
 ENV SETTINGS=/root/app-configs-docker.ini
-COPY --from=builder /app/bin/challenge .
+COPY .data/mock_data.xlsx  .
+ENV DATA_SOURCE=/root/mock_data.xlsx
+COPY --from=builder /app/bin/aroundhome .
+RUN apk add bash
 EXPOSE 3000
 LABEL Name=app-boiler-plate Version=0.0.1
-CMD ["./challenge", "serve_api"]
+CMD ["./aroundhome", "serve_api"]

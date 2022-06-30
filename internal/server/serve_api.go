@@ -18,13 +18,11 @@ import (
 
 const (
 	port = 3000
-	// ideally it should come from configs
-	dbFilePath = "./.data/data.db"
 )
 
 // @title aroundhome-challennge API docs
 // @version 0.1
-// @description bsdex's code challenge API specs.
+// @description aroundhome's code aroundhome API specs.
 
 // @contact.name Muhammad Talha
 // @contact.email talhach891@gmail.com
@@ -121,6 +119,4 @@ var serverApi = &cobra.Command{
 
 func init() {
 	rootCommand.AddCommand(serverApi)
-	//	add flags
-	rootCommand.PersistentFlags().Bool("reset.db", true, "reset database")
 }

@@ -8,8 +8,8 @@ import (
 )
 
 var rootCommand = &cobra.Command{
-	Use:  "challenge",
-	Long: "bsdex code challenge",
+	Use:  "aroundhome",
+	Long: "aroundhome code aroundhome",
 }
 
 func Execute() {
