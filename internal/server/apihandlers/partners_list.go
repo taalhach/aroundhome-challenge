@@ -29,9 +29,11 @@ type partnersListResponse struct {
 // @Description This API can be used to retrieve best possible matched partners w.r.t distance and rating,
 // @Success 200 {object} partnersListResponse
 // @Failure 404 {object} forms.BasicResponse
-//@Param material query  string false "Floor material" Enums(wood, carpet, tiles)
-//@Param latitude query  number false "Latitude(example: 53.544422)"
-//@Param longitude query  number false "Longitude(example: 10.0011)"
+//@Param material query  string true "Floor material" Enums(wood, carpet, tiles)
+//@Param latitude query  number true "Latitude(example: 53.544422)"
+//@Param longitude query  number true "Longitude(example: 10.0011)"
+//@Param page query  number false "page"
+//@Param limit query  number false "limit"
 // @Router /partners [get]
 func PartnersList(c echo.Context) error {
 	form := new(matchedPartnersListForm)
@@ -45,7 +47,6 @@ func PartnersList(c echo.Context) error {
 
 	// add material filter
 	form.Filters = append(form.Filters, fmt.Sprintf("material:eq:%s", form.Material))
-
 	items, total, err := dbutils.FindMatchedPartners(&form.BasicList, form.Longitude, form.Latitude)
 	if err != nil {
 		return err

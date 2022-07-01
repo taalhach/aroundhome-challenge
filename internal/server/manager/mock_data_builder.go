@@ -50,7 +50,7 @@ func CreateMockData(db *database.DbSession, dataFilePath string, force bool) err
 			continue
 		}
 
-		// not enough values for partners
+		// not enough values for partner
 		if len(row) < 3 {
 			continue
 		}

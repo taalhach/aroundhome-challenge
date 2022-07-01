@@ -24,7 +24,7 @@ type partnerDetailsResponse struct {
 // @Description This API returns partner details.
 // @Success 200 {object} partnerDetailsResponse
 // @Failure 404 {object} forms.BasicResponse
-// @Param id path int 0 "Partner Id(example 272)"
+// @Param id path int true "Partner Id(example 272)"
 // @Router /partners/{id} [get]
 func PartnerDetails(c echo.Context) error {
 	form := new(partnerDetailsForm)

@@ -107,20 +107,31 @@ paths:
         - tiles
         in: query
         name: material
+        required: true
         type: string
       - description: 'Latitude(example: 53.544422)'
         in: query
         name: latitude
+        required: true
         type: number
       - description: 'Longitude(example: 10.0011)'
         in: query
         name: longitude
+        required: true
+        type: number
+      - description: page
+        in: query
+        name: page
+        type: number
+      - description: limit
+        in: query
+        name: limit
         type: number
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse'
+            $ref: '#/definitions/internal_server_apihandlers.partnersListResponse'
         "404":
           description: Not Found
           schema:
@@ -133,12 +144,13 @@ paths:
       - description: Partner Id(example 272)
         in: path
         name: id
+        required: true
         type: integer
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_server_apihandlers.partnerDetailsResponse'
+            $ref: '#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse'
         "404":
           description: Not Found
           schema:

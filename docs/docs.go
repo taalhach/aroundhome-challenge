@@ -37,18 +37,33 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Floor material",
                         "name": "material",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "number",
                         "description": "Latitude(example: 53.544422)",
                         "name": "latitude",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "number",
                         "description": "Longitude(example: 10.0011)",
                         "name": "longitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "limit",
+                        "name": "limit",
                         "in": "query"
                     }
                 ],
@@ -56,7 +71,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse"
+                            "$ref": "#/definitions/internal_server_apihandlers.partnersListResponse"
                         }
                     },
                     "404": {
@@ -77,14 +92,15 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Partner Id(example 272)",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_server_apihandlers.partnerDetailsResponse"
+                            "$ref": "#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse"
                         }
                     },
                     "404": {

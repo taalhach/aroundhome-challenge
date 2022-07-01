@@ -1,12 +1,14 @@
-# Bsdex Code challenge
+# Aroundhome Code challenge
 
-A rest server which provides CURD APIs for page data.
+Aroundhome code challenge is a REST API server which proposes the right
+partner based on the details of a customer's flooring project.
   
   ## Frameworks, database and ORM used
   - [Echo](https://echo.labstack.com)
   - [Gorm](https://gorm.io/docs/)
-  - [Sqlite](https://www.sqlite.org/index.html)
-
+  - [Postgis](https://postgis.net)
+  - [swaggo/swag](https://github.com/swaggo/swag) (*for API specs*)
+## How to build and run server
 ## Docker
 First build docker image with `docker-compose` command
 ```
@@ -19,36 +21,10 @@ docker-compose up -d
 ```
   Above commands will run a http server on port 3000. http://localhost:3000 which will redirect to swagger API specs page. 
  
-## Local Setup
-
-### Build 
-Run make command it will download all libraries and builds binary files.
-```
-make build
-```
-
-### Run server 
-Use following command in order to run http server.
-```
-make run
-```
 
 ### Run Unit Tests 
 Use following command for unit tests.
 ```
 make test-unit
-```
-
-## Useful commands
-Use help argument to list all supported commands
-```
-./bin/challenge --help
-```
-
-#### Serve api
-`serve_api` command starts server on `3000` port.
-
-```
-./bin/challenge serve_api
 ```
 
