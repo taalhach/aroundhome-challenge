@@ -16,7 +16,7 @@ type partnerDetailsForm struct {
 
 type partnerDetailsResponse struct {
 	forms.BasicResponse
-	Partner *dbutils.PartnerListItem
+	Partner *dbutils.PartnerListItem `json:"partner"`
 }
 
 //PartnerDetails handler for to get page details
