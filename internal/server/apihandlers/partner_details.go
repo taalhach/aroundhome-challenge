@@ -19,13 +19,13 @@ type partnerDetailsResponse struct {
 	Partner *dbutils.PartnerListItem `json:"partner"`
 }
 
-//PartnerDetails handler for to get page details
-// @Summary Get page data's details
-// @Description This API returns page data details.
-// @Success 200 {object} pageDataResponse
+//PartnerDetails handler for getting partner details
+// @Summary Get partner's details
+// @Description This API returns partner details.
+// @Success 200 {object} partnerDetailsResponse
 // @Failure 404 {object} forms.BasicResponse
-// @Param url path string false "URL"
-// @Router /page_data/{url} [get]
+// @Param id path int 0 "Partner Id(example 272)"
+// @Router /partners/{id} [get]
 func PartnerDetails(c echo.Context) error {
 	form := new(partnerDetailsForm)
 	if err := c.Bind(form); err != nil {
@@ -36,7 +36,7 @@ func PartnerDetails(c echo.Context) error {
 		return err
 	}
 
-	// check if partner exists
+	// check if partner exists and fetch details
 	has, partner, err := dbutils.PartnerDetails(&models.Partner{Id: form.Id})
 	if err != nil {
 		return err

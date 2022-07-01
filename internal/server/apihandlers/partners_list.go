@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/taalhach/aroundhome-challennge/internal/server/common"
 	"github.com/taalhach/aroundhome-challennge/internal/server/database/dbutils"
+	_ "github.com/taalhach/aroundhome-challennge/pkg/forms"
 )
 
 type matchedPartnersListForm struct {
@@ -25,11 +26,13 @@ type partnersListResponse struct {
 
 //PartnersList finds best possible matched partners
 // @Summary Get best possible matched partners
-// @Description This API can be used to retrieve page data list,
-// @Description which is filterable and provides capabilities on basis of all fields.
+// @Description This API can be used to retrieve best possible matched partners w.r.t distance and rating,
 // @Success 200 {object} partnersListResponse
 // @Failure 404 {object} forms.BasicResponse
-// @Router /page_data [get]
+//@Param material query  string false "Floor material" Enums(wood, carpet, tiles)
+//@Param latitude query  number false "Latitude(example: 53.544422)"
+//@Param longitude query  number false "Longitude(example: 10.0011)"
+// @Router /partners [get]
 func PartnersList(c echo.Context) error {
 	form := new(matchedPartnersListForm)
 	if err := c.Bind(form); err != nil {
@@ -56,5 +59,6 @@ func PartnersList(c echo.Context) error {
 		},
 		Items: items,
 	}
+
 	return c.JSON(http.StatusOK, ret)
 }

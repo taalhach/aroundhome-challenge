@@ -23,79 +23,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/page_data": {
+        "/partners": {
             "get": {
-                "description": "This API can be used to retrieve page data list,\nwhich is filterable and provides capabilities on basis of all fields.",
-                "summary": "Get page data list",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/forms.BasicResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "This API is used to update page data. Only clicks and views are updated with this Request.",
-                "consumes": [
-                    "application/json"
-                ],
-                "summary": "Update Page data",
+                "description": "This API can be used to retrieve best possible matched partners w.r.t distance and rating,",
+                "summary": "Get best possible matched partners",
                 "parameters": [
                     {
-                        "description": "Page",
-                        "name": "page",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataUpdateForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataResponse"
-                        }
+                        "enum": [
+                            "wood",
+                            "carpet",
+                            "tiles"
+                        ],
+                        "type": "string",
+                        "description": "Floor material",
+                        "name": "material",
+                        "in": "query"
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/forms.BasicResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "An API to create page data. If page url already exist this request will fail",
-                "consumes": [
-                    "application/json"
-                ],
-                "summary": "Create Page data",
-                "parameters": [
                     {
-                        "description": "Page",
-                        "name": "page",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataCreateForm"
-                        }
+                        "type": "number",
+                        "description": "Latitude(example: 53.544422)",
+                        "name": "latitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Longitude(example: 10.0011)",
+                        "name": "longitude",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                            "$ref": "#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse"
                         }
                     },
                     "404": {
@@ -107,15 +68,15 @@ const docTemplate = `{
                 }
             }
         },
-        "/page_data/{url}": {
+        "/partners/{id}": {
             "get": {
-                "description": "This API returns page data details.",
-                "summary": "Get page data's details",
+                "description": "This API returns partner details.",
+                "summary": "Get partner's details",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "URL",
-                        "name": "url",
+                        "type": "integer",
+                        "description": "Partner Id(example 272)",
+                        "name": "id",
                         "in": "path"
                     }
                 ],
@@ -123,36 +84,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/forms.BasicResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/page_data/{url}/increment": {
-            "patch": {
-                "description": "This API is used to increment page views and clicks.",
-                "summary": "Increments clicks and views",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "URL",
-                        "name": "url",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apihandlers.pageDataResponse"
+                            "$ref": "#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse"
                         }
                     },
                     "404": {
@@ -166,53 +98,32 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "apihandlers.pageDataCreateForm": {
-            "type": "object",
-            "required": [
-                "url"
-            ],
-            "properties": {
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "apihandlers.pageDataResponse": {
+        "dbutils.PartnerListItem": {
             "type": "object",
             "properties": {
-                "errors": {
-                    "type": "object",
-                    "additionalProperties": {
+                "distance": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "materials": {
+                    "type": "array",
+                    "items": {
                         "type": "string"
                     }
                 },
-                "message": {
+                "name": {
                     "type": "string"
                 },
-                "page": {
-                    "$ref": "#/definitions/models.PageData"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "apihandlers.pageDataUpdateForm": {
-            "type": "object",
-            "required": [
-                "clicks",
-                "url",
-                "views"
-            ],
-            "properties": {
-                "clicks": {
-                    "type": "integer"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "views": {
-                    "type": "integer"
+                "rating": {
+                    "type": "number"
                 }
             }
         },
@@ -233,25 +144,82 @@ const docTemplate = `{
                 }
             }
         },
-        "models.PageData": {
+        "github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse": {
             "type": "object",
             "properties": {
-                "clicks": {
-                    "type": "integer"
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
-                "created_at": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "last_updated_at": {
-                    "type": "integer"
-                },
-                "url": {
+                "message": {
                     "type": "string"
                 },
-                "views": {
+                "partner": {
+                    "$ref": "#/definitions/dbutils.PartnerListItem"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dbutils.PartnerListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_server_apihandlers.partnerDetailsResponse": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "partner": {
+                    "$ref": "#/definitions/dbutils.PartnerListItem"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "internal_server_apihandlers.partnersListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dbutils.PartnerListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "total": {
                     "type": "integer"
                 }
             }
@@ -266,7 +234,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "aroundhome-challennge API docs",
-	Description:      "aroundhome API specs.",
+	Description:      "aroundhome's code aroundhome API specs.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

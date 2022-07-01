@@ -1,36 +1,22 @@
 definitions:
-  apihandlers.pageDataCreateForm:
+  dbutils.PartnerListItem:
     properties:
-      url:
-        type: string
-    required:
-    - url
-    type: object
-  apihandlers.pageDataResponse:
-    properties:
-      errors:
-        additionalProperties:
+      distance:
+        type: number
+      id:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      materials:
+        items:
           type: string
-        type: object
-      message:
+        type: array
+      name:
         type: string
-      page:
-        $ref: '#/definitions/models.PageData'
-      success:
-        type: boolean
-    type: object
-  apihandlers.pageDataUpdateForm:
-    properties:
-      clicks:
-        type: integer
-      url:
-        type: string
-      views:
-        type: integer
-    required:
-    - clicks
-    - url
-    - views
+      rating:
+        type: number
     type: object
   forms.BasicResponse:
     properties:
@@ -43,19 +29,56 @@ definitions:
       success:
         type: boolean
     type: object
-  models.PageData:
+  github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse:
     properties:
-      clicks:
-        type: integer
-      created_at:
-        type: integer
-      id:
-        type: integer
-      last_updated_at:
-        type: integer
-      url:
+      errors:
+        additionalProperties:
+          type: string
+        type: object
+      message:
         type: string
-      views:
+      partner:
+        $ref: '#/definitions/dbutils.PartnerListItem'
+      success:
+        type: boolean
+    type: object
+  github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dbutils.PartnerListItem'
+        type: array
+      page:
+        type: integer
+      pages:
+        type: integer
+      total:
+        type: integer
+    type: object
+  internal_server_apihandlers.partnerDetailsResponse:
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        type: string
+      partner:
+        $ref: '#/definitions/dbutils.PartnerListItem'
+      success:
+        type: boolean
+    type: object
+  internal_server_apihandlers.partnersListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dbutils.PartnerListItem'
+        type: array
+      page:
+        type: integer
+      pages:
+        type: integer
+      total:
         type: integer
     type: object
 host: localhost:3000
@@ -63,107 +86,60 @@ info:
   contact:
     email: talhach891@gmail.com
     name: Muhammad Talha
-  description: bsdex's code aroundhome API specs.
+  description: aroundhome's code aroundhome API specs.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: aroundhome-challennge API docs
   version: "0.1"
 paths:
-  /page_data:
+  /partners:
     get:
-      description: |-
-        This API can be used to retrieve page data list,
-        which is filterable and provides capabilities on basis of all fields.
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apihandlers.pageDataResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/forms.BasicResponse'
-      summary: Get page data list
-    post:
-      consumes:
-      - application/json
-      description: An API to create page data. If page url already exist this request
-        will fail
+      description: This API can be used to retrieve best possible matched partners
+        w.r.t distance and rating,
       parameters:
-      - description: Page
-        in: body
-        name: page
-        required: true
-        schema:
-          $ref: '#/definitions/apihandlers.pageDataCreateForm'
+      - description: Floor material
+        enum:
+        - wood
+        - carpet
+        - tiles
+        in: query
+        name: material
+        type: string
+      - description: 'Latitude(example: 53.544422)'
+        in: query
+        name: latitude
+        type: number
+      - description: 'Longitude(example: 10.0011)'
+        in: query
+        name: longitude
+        type: number
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/apihandlers.pageDataResponse'
+            $ref: '#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnersListResponse'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/forms.BasicResponse'
-      summary: Create Page data
-    put:
-      consumes:
-      - application/json
-      description: This API is used to update page data. Only clicks and views are
-        updated with this Request.
-      parameters:
-      - description: Page
-        in: body
-        name: page
-        required: true
-        schema:
-          $ref: '#/definitions/apihandlers.pageDataUpdateForm'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apihandlers.pageDataResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/forms.BasicResponse'
-      summary: Update Page data
-  /page_data/{url}:
+      summary: Get best possible matched partners
+  /partners/{id}:
     get:
-      description: This API returns page data details.
+      description: This API returns partner details.
       parameters:
-      - description: URL
+      - description: Partner Id(example 272)
         in: path
-        name: url
-        type: string
+        name: id
+        type: integer
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/apihandlers.pageDataResponse'
+            $ref: '#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/forms.BasicResponse'
-      summary: Get page data's details
-  /page_data/{url}/increment:
-    patch:
-      description: This API is used to increment page views and clicks.
-      parameters:
-      - description: URL
-        in: path
-        name: url
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apihandlers.pageDataResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/forms.BasicResponse'
-      summary: Increments clicks and views
+      summary: Get partner's details
 swagger: "2.0"
