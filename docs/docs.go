@@ -84,7 +84,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github.com_taalhach_aroundhome-challennge_internal_server_apihandlers.partnerDetailsResponse"
+                            "$ref": "#/definitions/internal_server_apihandlers.partnerDetailsResponse"
                         }
                     },
                     "404": {
@@ -121,6 +121,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "radius_in_meters": {
+                    "type": "integer"
                 },
                 "rating": {
                     "type": "number"

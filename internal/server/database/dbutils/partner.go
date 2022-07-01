@@ -15,6 +15,7 @@ type PartnerListItem struct {
 	Longitude float64        `gorm:"column:longitude" json:"longitude"`
 	Distance  float64        `gorm:"column:distance" json:"distance"`
 	Rating    float32        `gorm:"column:rating" json:"rating"`
+	Radius    int            `gorm:"column:radius" json:"radius_in_meters"`
 	Materials pq.StringArray `gorm:"column:materials;type:text[]" json:"materials"`
 }
 
@@ -54,7 +55,7 @@ func FindMatchedPartners(listParams *common.BasicList, longitude, latitude float
 	// apply pagination by adding limit and offset
 	query = listParams.Paginate(query)
 
-	const selectColumns = "partners.id, partners.name, latitude, longitude, rating, ST_DistanceSphere(ST_MakePoint(longitude, latitude),ST_MakePoint(?, ?)) AS distance, string_to_array(STRING_AGG(materials.name,','), ',') AS materials"
+	const selectColumns = "partners.id, partners.name, latitude, longitude, rating, radius, ST_DistanceSphere(ST_MakePoint(longitude, latitude),ST_MakePoint(?, ?)) AS distance, string_to_array(STRING_AGG(materials.name,','), ',') AS materials"
 	if err := query.Select(selectColumns, longitude, latitude).Order("partners.rating DESC, distance").Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
@@ -68,7 +69,7 @@ func PartnerDetails(target *models.Partner) (bool, *PartnerListItem, error) {
 	if err := database.Db.Model(&models.Partner{}).
 		Joins("INNER JOIN partner_materials AS pm ON pm.partner_id = partners.id").
 		Joins("INNER JOIN materials ON materials.id = pm.material_id").
-		Where(target).Select("partners.id,partners.name,partners.latitude,partners.longitude, partners.rating, string_to_array(STRING_AGG(materials.name,','), ',') AS materials").
+		Where(target).Select("partners.id,partners.name,partners.latitude,partners.longitude,radius, partners.rating, string_to_array(STRING_AGG(materials.name,','), ',') AS materials").
 		Group("partners.id").Take(&partner).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return false, nil, nil
