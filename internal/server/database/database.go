@@ -3,6 +3,11 @@ package database
 import (
 	"fmt"
 
+	"github.com/taalhach/aroundhome-challennge/pkg/items"
+
+	"github.com/taalhach/aroundhome-challennge/internal/server/models"
+	"gorm.io/gorm/clause"
+
 	"github.com/taalhach/aroundhome-challennge/internal/server/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -48,3 +53,18 @@ func Migrate(models ...interface{}) error {
 	return Db.AutoMigrate(models...)
 }
 
+//InitData create materials if already exists it does nothing
+func InitData() error {
+	tx := Db.Begin()
+	for name, _ := range items.Materials {
+		material := models.Material{
+			Name: name,
+		}
+
+		if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&material).Error; err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+}

@@ -17,7 +17,7 @@ const (
 
 var mockData = &cobra.Command{
 	Use:                   "mock_data",
-	Short:                 fmt.Sprintf("servers api on %v port", port),
+	Short:                 "creates mock data",
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		// check if data source path env variable is set
@@ -38,12 +38,15 @@ var mockData = &cobra.Command{
 			os.Exit(1)
 		}
 
-		manager.InitMockDataBuilder(&database.Db, file)
+		force, _ := cmd.Flags().GetBool("force")
+		if err := manager.CreateMockData(&database.Db, file, force); err != nil {
+			fmt.Printf("failed to create mock data, err: %v\n", err)
+			os.Exit(1)
+		}
 	},
 }
 
 func init() {
 	rootCommand.AddCommand(mockData)
-	//	add flags
-	rootCommand.PersistentFlags().Bool("reset.db", true, "reset database")
+	rootCommand.PersistentFlags().Bool("force", false, "reset database")
 }

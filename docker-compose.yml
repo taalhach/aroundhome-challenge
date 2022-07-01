@@ -1,5 +1,8 @@
 version: "3.4"
 
+networks:
+  aroundhome-network:
+    driver: bridge
 services:
   postgres:
     image: postgis/postgis:14-3.2-alpine
@@ -9,14 +12,29 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
     ports:
-      - 5432:5432
-
-  server:
-    image: server
+      - 5434:5432
+    networks:
+      - aroundhome-network
+  mock-data:
+    image: aroundhome
     build:
       context: .
-      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres
+    command: /root/aroundhome mock_data
+    restart: on-failure
+    networks:
+      - aroundhome-network
+  server:
+    image: aroundhome
+    build:
+      context: .
+    command: /root/aroundhome serve_api
     ports:
       - 3000:3000
     depends_on:
       - postgres
+      - mock-data
+    restart: on-failure
+    networks:
+      - aroundhome-network

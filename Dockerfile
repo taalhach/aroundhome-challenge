@@ -16,5 +16,4 @@ ENV DATA_SOURCE=/root/mock_data.xlsx
 COPY --from=builder /app/bin/aroundhome .
 RUN apk add bash
 EXPOSE 3000
-LABEL Name=app-boiler-plate Version=0.0.1
-CMD ["./aroundhome", "serve_api"]
+LABEL Name=aroundhome Version=0.0.1

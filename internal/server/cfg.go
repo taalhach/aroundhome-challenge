@@ -23,7 +23,7 @@ func loadConfigs() (*configs.MainConfig, error) {
 	file := os.Getenv(envKey)
 	if file == "" {
 		fmt.Printf("Missing env variable: %v", envKey)
-		os.Exit(1)
+		return nil, nil
 	}
 
 	dict, err := ini.Load(file)
@@ -42,7 +42,12 @@ func loadConfigs() (*configs.MainConfig, error) {
 	// now apply migrations
 	if err := database.Migrate(models.Material{}, models.Partner{}, models.PartnerMaterial{}); err != nil {
 		fmt.Printf("db migrations failed, err: %v", err)
-		os.Exit(1)
+		return nil, nil
+	}
+
+	if err := database.InitData(); err != nil {
+		fmt.Printf("init data failed, err: %v", err)
+		return nil, nil
 	}
 
 	return MainConfigs, err

@@ -40,9 +40,8 @@ func PartnersList(c echo.Context) error {
 		return err
 	}
 
-	material := c.Param("material")
 	// add material filter
-	form.Filters = append(form.Filters, fmt.Sprintf("material:eq:%s", material))
+	form.Filters = append(form.Filters, fmt.Sprintf("material:eq:%s", form.Material))
 
 	items, total, err := dbutils.FindMatchedPartners(&form.BasicList, form.Longitude, form.Latitude)
 	if err != nil {

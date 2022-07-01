@@ -52,7 +52,7 @@ func FindMatchedPartners(listParams *common.BasicList, longitude, latitude float
 	query = listParams.Paginate(query)
 
 	const selectColumns = "partners.id, partners.name, latitude, longitude, rating, ST_DistanceSphere(ST_MakePoint(longitude, latitude),ST_MakePoint(?, ?)) AS distance"
-	if err := query.Select(selectColumns, longitude, latitude).Order("partners.rating DESC, distance DESC").Find(&items).Error; err != nil {
+	if err := query.Select(selectColumns, longitude, latitude).Order("partners.rating DESC, distance").Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
 

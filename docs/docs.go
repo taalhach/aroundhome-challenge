@@ -266,7 +266,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "aroundhome-challennge API docs",
-	Description:      "bsdex's code aroundhome API specs.",
+	Description:      "aroundhome API specs.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
