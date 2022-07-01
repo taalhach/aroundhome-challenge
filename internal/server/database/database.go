@@ -20,17 +20,17 @@ type DbSession struct {
 
 var Db DbSession
 
-func MustConnectDB(cfg *configs.DatabaseConfig) {
+func ConnectDB(cfg *configs.DatabaseConfig) error {
 	db, err := gorm.Open(postgres.Open(cfg.ConnString()), &gorm.Config{})
 	if err != nil {
 		fmt.Printf("Got error when connect database, the error is '%v'", err)
-		panic(err)
+		return err
 	}
 
 	sqlDb, err := db.DB()
 	if err != nil {
 		fmt.Printf("db connection configs failed, the error is '%v'", err)
-		panic(err)
+		return err
 	}
 
 	sqlDb.SetMaxOpenConns(10)
@@ -45,6 +45,8 @@ func MustConnectDB(cfg *configs.DatabaseConfig) {
 	Db = DbSession{
 		db,
 	}
+
+	return nil
 }
 
 //Migrate run migration and takes models as argument

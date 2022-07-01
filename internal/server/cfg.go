@@ -36,8 +36,10 @@ func loadConfigs() (*configs.MainConfig, error) {
 		return nil, err
 	}
 
-	// must make database connection or panic
-	database.MustConnectDB(MainConfigs.Database)
+	// must make database connection
+	if err := database.ConnectDB(MainConfigs.Database); err != nil {
+		return nil, err
+	}
 
 	// now apply migrations
 	if err := database.Migrate(models.Material{}, models.Partner{}, models.PartnerMaterial{}); err != nil {
